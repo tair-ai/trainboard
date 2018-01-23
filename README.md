@@ -1,4 +1,4 @@
-# traniboard
+# trainboard
 
 ## Example
 
