@@ -1,7 +1,4 @@
-proto_src/
-__pycache__
-docs/_*
-build
-dist
-*.egg-info
-runs/*
+.DS_Store
+node_modules/
+dist/
+npm-debug.log
