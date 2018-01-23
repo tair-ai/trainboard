@@ -1,1 +1,1 @@
-protoc tensorboardX/src/*.proto --python_out=.
+protoc trainboard/src/*.proto --python_out=.
