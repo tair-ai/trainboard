@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <title>Trainboard</title>
+            <!--script src="https://d3js.org/d3.v5.min.js"></script-->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+            <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    </head>
+<body>
+    <div>Loss visualization</div>
+    <div id="chart"></div>
+    <div style="width:800px;height:400px;">
+        <canvas id="linechart" width="600" height="400"></canvas>
+    </div>
+</body>
+
+
+
+<script type="text/javascript">
+  let timerId = 1 // 模拟计时器id，唯一性
+  let timerObj = {} // 计时器存储器
+
+  // d3 mode
+  function d3plot(data) {
+        //删除整个SVG
+        // d3.select('#chart').remove();   
+        //清空SVG中的内容
+        d3.select('#chart')
+            .selectAll('*')
+            .remove();                    
+
+        var width = 1000, height = 600, margin = {left:50, top:30, right:20,bottom:20},
+        // g_width = width
+        // g_height = height
+        g_width = width - margin.left - margin.right,
+        g_height = height - margin.top - margin.bottom;
+
+        //获取div，向里面添加svg
+        var svg = d3.select("#chart")
+            .append("svg:svg")
+            .attr("width", width)
+            .attr("height", height)
+
+        //添加g元素
+        var g = d3.select("svg")
+            .append("g")
+            .attr("transform", "translate("+margin.left+","+margin.top+")")
+
+        // console.log(d3.scale)
+        var scale_x = d3.scaleLinear()
+            .domain([0, data.length-1])
+            .range([0, g_width])
+        var scale_y = d3.scaleLinear()
+            .domain([0, d3.max(data)])
+            .range([0, g_height])
+
+
+        let line_generator = d3.line()
+            .x(function(d, i){return scale_x(i);})
+            .y(function(d){return g_height - scale_y(d);})
+            .curve(d3.curveNatural)
+
+        console.log(data)
+        d3.select("g")
+            .append("path")
+            .attr("d", line_generator(data))
+    }
+    // D3 svg mode
+
+  function start () {
+    const id = timerId++
+    timerObj[id] = true
+    async function timerFn () {
+      if (!timerObj[id]) return
+      const { data } = await axios.get("/loss") // 模拟请求
+      var ctx = document.getElementById("linechart").getContext('2d');
+    //   console.log(data.length)
+      indexs = [...data.keys()]
+    //   console.log(indexs)
+      var myChart = new Chart(ctx, {
+                type: 'line',
+                data: 
+                {
+                    labels: indexs,
+                    datasets: [{
+                        data: data,
+                        label: 'loss',
+                        fill: false,
+                        pointBorderWidth: 0,
+                        showLine: true,
+                        // backgroundColor: "#fff", //背景填充色
+                        // borderColor: "#36A2EB", //路径颜色
+                        // pointBackgroundColor: "#36A2EB", //数据点颜色
+                        // pointBorderColor: "#fff", //数据点边框颜色
+                    }],
+                },
+                options: {
+
+                }
+            })
+        //   chartplot(data)
+      
+      setTimeout(timerFn, 10000)
+    }
+    timerFn()
+  }
+
+
+  start ()
+</script>
+</html>
